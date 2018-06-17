@@ -2,8 +2,7 @@
 
 var CANVAS,
     ctx,
-    myGame,
-    myReq;
+    myGame;
 var myColors = new Colors();
 
 var State = {
@@ -12,10 +11,10 @@ var State = {
   gameStarted: false,
   lastFrameTimeMs: 0, // The last time the loop was run
   maxFPS: 60, // The maximum FPS allowed
+  playTime: 0,
   frameCounter: 0,
   lastKey: 'none'
 };
-
 
 function Colors() {
   this.black = 'rgba(0, 0, 0, 1)';
@@ -29,6 +28,25 @@ function Colors() {
   this.blue = 'rgba(0, 0, 230, 0.7)';
 }
 
+function softReset() {
+  console.log('soft reset run');
+  myGame = undefined;
+  State = {
+    myReq: undefined,
+    loopRunning: false,
+    gameStarted: false,
+    lastFrameTimeMs: 0, // The last time the loop was run
+    maxFPS: 60, // The maximum FPS allowed
+    playTime: 0,
+    frameCounter: 0,
+    lastKey: 'none'
+  };
+}
+
+// function hardReset() {
+//   console.log('hard reset run');
+//
+// }
 
 function Game(updateDur) {
   this.timeGap = 0;
@@ -38,13 +56,19 @@ function Game(updateDur) {
   this.bg = new Image();
   this.lastKey = 0;
   this.pausedTxt = undefined;
+  this.boxX = 10;
+  this.boxY = 10;
+  this.boxVel = 10;
+  this.grid = undefined;
 
   this.init = function() {
     this.bg.src = 'bg1.png';
+    this.grid = [];
+    this.lastUpdate = performance.now();
   };
 
-  this.draw = function() {
-
+  this.moveBox = function() {
+    this.boxX += this.boxVel;
   };
 
   this.drawBG = function() {
@@ -52,33 +76,42 @@ function Game(updateDur) {
     ctx.drawImage(this.bg,4,4,CANVAS.width-9,CANVAS.height-9);
   };
 
-  this.update = function() {
+  this.draw = function() {
+    ctx.beginPath();
+    ctx.rect(this.boxX,this.boxY,100,100);
+    ctx.stroke();
+  };
 
+
+  this.update = function() {
       if (this.paused === false) { // performance based update: myGame.update() runs every myGame.updateDuration milliseconds
 
-            if (State.playTime < 1) { // make sure on first update() only run once
-              this.lastUpdate = performance.now();
-              this.timeGap = 0;
-            } else {
-              this.timeGap = performance.now() - this.lastUpdate;
-            }
+        // if (State.playTime < 1) { // make sure on first update() only run once
+        //   this.lastUpdate = performance.now();
+        //   this.timeGap = 0;
+        // } else {
+        //   this.timeGap = performance.now() - this.lastUpdate;
+        // }
+
+            this.timeGap = performance.now() - this.lastUpdate;
 
             if ( this.timeGap >= this.updateDuration ) {
+                  // console.log('update run');
               let timesToUpdate = this.timeGap / this.updateDuration;
               for (let i=1; i < timesToUpdate; i++) {
                 // update children objects
+                this.moveBox();
               }
               this.lastUpdate = performance.now();
             }
 
-            this.updatePlayTime();
       } else if (this.paused === true) {
         // do nothin
       } else {
         console.log('game pause issue');
       }
 
-  };
+  }; // end update
 
 }
 
@@ -116,6 +149,16 @@ function getRandomIntInclusive(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
 }
 
+function generalLoopReset() {
+  if (State.myReq !== undefined) {  // reset game loop if already started
+    cancelAnimationFrame(State.myReq);
+    softReset();
+  }
+  myGame = new Game(500); // ms per update()
+  myGame.init();
+  State.myReq = requestAnimationFrame(gameLoop);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $(document).ready(function() {
@@ -129,23 +172,24 @@ $(document).ready(function() {
   ctx.translate(0.5, 0.5);
 
   // start things up so that the background image can be drawn
-  myGame = new Game(10);
+  myGame = new Game(1000);
   myGame.init();
   State.loopRunning = true;
-  myReq = requestAnimationFrame(gameLoop);
+  myGame.drawBG();
+  State.myReq = requestAnimationFrame(gameLoop);
 
   $('#start-btn').click(function() {
     console.log("start button clicked");
-    if (State.myReq !== undefined) {  // reset game loop if already started
-      console.log('tried to cancel');
-      cancelAnimationFrame(State.myReq);
-      hardReset();
-    }
-    myGame = new Game(10); // param = ms per update()
-    myGame.init();
-    State.myReq = requestAnimationFrame(gameLoop);
+    generalLoopReset();
     State.loopRunning = true;
     State.gameStarted = true;
+  });
+
+  $('#reset-btn').click(function() {
+    console.log("reset button clicked");
+    generalLoopReset();
+    State.loopRunning = true;
+    State.gameStarted = false;
   });
 
 });

@@ -16,15 +16,29 @@ body {
 
 .title-container {
   text-align: center;
-  margin: 40px auto 0px auto;
+  margin: 40px auto 20px auto;
+}
+#title {
+  font-size: 40px;
+  font-family: sans-serif;
+}
+
+.buttons-container {
+  width: 158px;
+  height: 100%;
+  margin: 0px auto;
   /* outline-color: green;
   outline-style: solid;
   outline-width: 1px; */
 }
-
-#title {
-  font-size: 40px;
-  font-family: sans-serif;
+.buttons-container button {
+  color: black;
+  width: 50px;
+  height: 28px;
+  background-color: lightblue;
+}
+.buttons-container button:hover {
+  background-color: lightgreen;
 }
 
 .canvas-container {
@@ -32,7 +46,6 @@ body {
   width: 800px;
   height: 100%;
 }
-
 #canvas {
   margin: 20px auto;
 }

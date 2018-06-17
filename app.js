@@ -48,6 +48,22 @@ function softReset() {
 //
 // }
 
+function Box(x,y,color) {
+  this.x = x;
+  this.y = y;
+  this.color = color;
+  this.size =  9;
+
+  this.draw = function() {
+    // console.log('box draw');
+    ctx.beginPath();
+    ctx.rect(this.x,this.y,this.size,this.size);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    // ctx.stroke();
+  };
+} // end box
+
 function Game(updateDur) {
   this.timeGap = 0;
   this.lastUpdate = 0;
@@ -60,10 +76,20 @@ function Game(updateDur) {
   this.boxY = 10;
   this.boxVel = 10;
   this.grid = undefined;
+  this.gridWidth = 81;
+  this.gridHeight = 60;
 
   this.init = function() {
     this.bg.src = 'bg1.png';
     this.grid = [];
+    for (let r = 0; r < this.gridHeight; r++) {
+      let tmpRow = [];
+      for (let c = 0; c < this.gridWidth; c++) {
+        tmpRow.push( new Box((c*9)+(c+1),(r*9)+(r+1),myColors.white)); // +1 is for 1 pixel gap between boxes
+      }
+      this.grid.push(tmpRow);
+    }
+    // console.log('grid = ', this.grid);
     this.lastUpdate = performance.now();
   };
 
@@ -92,10 +118,14 @@ function Game(updateDur) {
   };
 
   this.draw = function() {
-    ctx.beginPath();
-    ctx.rect(this.boxX,this.boxY,100,100);
-    ctx.stroke();
-  };
+
+    for (let c = 0; c < this.gridWidth-1; c++) {
+      for (let r = 0; r < this.gridHeight-1; r++) {
+        this.grid[r][c].draw();
+      }
+    }
+
+  }; // end draw
 
 
   this.update = function() {

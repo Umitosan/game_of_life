@@ -71,6 +71,21 @@ function Game(updateDur) {
     this.boxX += this.boxVel;
   };
 
+  this.pauseIt = function() {
+    console.log('GAME paused');
+    myGame.paused = true;
+    // this.pausedTxt.show = true;
+  };
+
+  this.unpauseIt = function() {
+    console.log('GAME un-paused');
+    myGame.paused = false;
+    // this.pausedTxt.show = false;
+    // this prevents pac from updating many times after UNpausing
+    this.lastUpdate = performance.now();
+    this.timeGap = 0;
+  };
+
   this.drawBG = function() {
     ctx.imageSmoothingEnabled = false;  // turns off AntiAliasing
     ctx.drawImage(this.bg,4,4,CANVAS.width-9,CANVAS.height-9);
@@ -172,7 +187,7 @@ $(document).ready(function() {
   ctx.translate(0.5, 0.5);
 
   // start things up so that the background image can be drawn
-  myGame = new Game(1000);
+  myGame = new Game(500);
   myGame.init();
   State.loopRunning = true;
   myGame.drawBG();
@@ -190,6 +205,15 @@ $(document).ready(function() {
     generalLoopReset();
     State.loopRunning = true;
     State.gameStarted = false;
+  });
+
+  $('#pause-btn').click(function() {
+    console.log("pause button clicked");
+    if (myGame.paused === false) {
+      myGame.pauseIt();
+    } else if (myGame.paused === true) {
+      myGame.unpauseIt();
+    }
   });
 
 });

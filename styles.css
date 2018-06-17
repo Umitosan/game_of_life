@@ -1,0 +1,38 @@
+
+body {
+  margin: 0px 0px;
+  background-color: lightgrey;
+}
+
+.main-container {
+  width: 840px;
+  height: 100%;
+  margin: 20px auto 0px auto;
+  border-color: black;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 6px;
+}
+
+.title-container {
+  text-align: center;
+  margin: 40px auto 0px auto;
+  /* outline-color: green;
+  outline-style: solid;
+  outline-width: 1px; */
+}
+
+#title {
+  font-size: 40px;
+  font-family: sans-serif;
+}
+
+.canvas-container {
+  margin: 0px auto;
+  width: 800px;
+  height: 100%;
+}
+
+#canvas {
+  margin: 20px auto;
+}

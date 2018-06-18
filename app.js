@@ -13,7 +13,9 @@ var State = {
   maxFPS: 60, // The maximum FPS allowed
   playTime: 0,
   frameCounter: 0,
-  lastKey: 'none'
+  lastKey: 'none',
+  mouseX: 0,
+  mouseY: 0,
 };
 
 function Colors() {
@@ -42,11 +44,6 @@ function softReset() {
     lastKey: 'none'
   };
 }
-
-// function hardReset() {
-//   console.log('hard reset run');
-//
-// }
 
 function Box(x,y,color) {
   this.x = x;
@@ -222,6 +219,15 @@ $(document).ready(function() {
   State.loopRunning = true;
   myGame.drawBG();
   State.myReq = requestAnimationFrame(gameLoop);
+
+  // mouse move on canvas event
+  canvas.addEventListener('mousemove', function(evt) {
+    let rect = CANVAS.getBoundingClientRect();
+      State.mouseX = evt.clientX - rect.left;
+      State.mouseY = evt.clientY - rect.top;
+      $("#coords-x").text(State.mouseX);
+      $("#coords-y").text(State.mouseY);
+  }, false);
 
   $('#start-btn').click(function() {
     console.log("start button clicked");

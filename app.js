@@ -76,7 +76,8 @@ function Game(updateDur) {
   this.curBoxC = 0;
   this.curBoxR = 0;
   this.mode = 'init';
-  this.simSpeed = 500; // milliseconds duration between game generations
+  // this.simSpeed = 500; // milliseconds duration between game generations
+  // this.simStart = 0;
 
   this.init = function() {
     this.bg.src = 'bg1.png';
@@ -88,7 +89,6 @@ function Game(updateDur) {
       }
       this.grid.push(tmpRow);
     }
-    this.grid[0][0].color = myColors.blue;
     this.lastUpdate = performance.now();
   };
 
@@ -114,13 +114,22 @@ function Game(updateDur) {
   this.eraseBox = function() {
     let c = Math.floor(State.mouseX / (this.boxSize+1));
     let r = Math.floor(State.mouseY / (this.boxSize+1));
-    // console.log('box clicked: Col='+c+"  Row="+r);
     this.grid[r][c].color = myColors.white;
   };
 
-  this.nextGen = function() {
-    // update board colors for next generation of sim
-  };
+  this.nextGen = function() { // update board colors for next generation of sim
+    for (let c = 0; c < this.gridWidth-1; c++) {
+      for (let r = 0; r < this.gridHeight-1; r++) {
+        if (this.grid[r][c].color === myColors.white) {
+          this.grid[r][c].color = myColors.blue;
+        } else if (this.grid[r][c].color === myColors.blue) {
+          this.grid[r][c].color = myColors.white;
+        } else {
+          console.log('grid color prob');
+        }
+      }
+    }
+  }; // end sim
 
   this.pauseIt = function() {
     console.log('GAME paused');
@@ -171,9 +180,10 @@ function Game(updateDur) {
                 // console.log('times to update = ', timesToUpdate);
               for (let i=1; i < timesToUpdate; i++) {
                 // update children objects
-                // this.moveBox();
-                if (this.mode === 'sim') { this.nextGen(); }
-              }
+                if (this.mode === 'sim') {
+                  this.nextGen();
+                }
+             }
               this.lastUpdate = performance.now();
             }
 
@@ -284,6 +294,7 @@ $(document).ready(function() {
   $('#start-btn').click(function() {
     console.log("start button clicked");
     myGame.mode = 'sim';
+    myGame.simStart = performance.now();
   });
 
   $('#reset-btn').click(function() {

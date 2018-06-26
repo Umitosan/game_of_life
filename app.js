@@ -15,7 +15,7 @@ var State = {
   frameCounter: 0,
   lastKey: 'none',
   mouseX: 0,
-  mouseY: 0,
+  mouseY: 0
 };
 
 function Colors() {
@@ -45,11 +45,11 @@ function softReset() {
   };
 }
 
-function Box(x,y,color) {
+function Box(x,y,color,size) {
   this.x = x;
   this.y = y;
   this.color = color;
-  this.size =  9;
+  this.size =  size;
 
   this.draw = function() {
     // console.log('box draw');
@@ -69,12 +69,14 @@ function Game(updateDur) {
   this.bg = new Image();
   this.lastKey = 0;
   this.pausedTxt = undefined;
-  this.boxX = 10;
-  this.boxY = 10;
-  this.boxVel = 10;
   this.grid = undefined;
+  this.boxSize = 9;
   this.gridWidth = 81;
   this.gridHeight = 60;
+  this.curBoxC = 0;
+  this.curBoxR = 0;
+  this.mode = 'init';
+  this.simSpeed = 500; // milliseconds duration between game generations
 
   this.init = function() {
     this.bg.src = 'bg1.png';
@@ -82,16 +84,42 @@ function Game(updateDur) {
     for (let r = 0; r < this.gridHeight; r++) {
       let tmpRow = [];
       for (let c = 0; c < this.gridWidth; c++) {
-        tmpRow.push( new Box((c*9)+(c+1),(r*9)+(r+1),myColors.white)); // +1 is for 1 pixel gap between boxes
+        tmpRow.push( new Box((c*9)+(c+1),(r*9)+(r+1),myColors.white,this.boxSize)); // +1 is for 1 pixel gap between boxes
       }
       this.grid.push(tmpRow);
     }
-    // console.log('grid = ', this.grid);
+    this.grid[0][0].color = myColors.blue;
     this.lastUpdate = performance.now();
   };
 
   this.moveBox = function() {
-    this.boxX += this.boxVel;
+    if (this.curBoxC === (this.gridWidth-1)) {
+      this.grid[this.curBoxR][this.curBoxC].color = myColors.white;
+      this.curBoxC = 0;
+      this.curBoxR += 1;
+      this.grid[this.curBoxR][this.curBoxC].color = myColors.blue;
+    } else {
+      this.grid[this.curBoxR][this.curBoxC].color = myColors.white;
+      this.curBoxC += 1;
+      this.grid[this.curBoxR][this.curBoxC].color = myColors.blue;
+    }
+  };
+
+  this.paintBox = function() {
+    let c = Math.floor(State.mouseX / (this.boxSize+1));
+    let r = Math.floor(State.mouseY / (this.boxSize+1));
+    // console.log('box clicked: Col='+c+"  Row="+r);
+    this.grid[r][c].color = myColors.blue;
+  };
+  this.eraseBox = function() {
+    let c = Math.floor(State.mouseX / (this.boxSize+1));
+    let r = Math.floor(State.mouseY / (this.boxSize+1));
+    // console.log('box clicked: Col='+c+"  Row="+r);
+    this.grid[r][c].color = myColors.white;
+  };
+
+  this.nextGen = function() {
+    // update board colors for next generation of sim
   };
 
   this.pauseIt = function() {
@@ -140,9 +168,11 @@ function Game(updateDur) {
             if ( this.timeGap >= this.updateDuration ) {
                   // console.log('update run');
               let timesToUpdate = this.timeGap / this.updateDuration;
+                // console.log('times to update = ', timesToUpdate);
               for (let i=1; i < timesToUpdate; i++) {
                 // update children objects
-                this.moveBox();
+                // this.moveBox();
+                if (this.mode === 'sim') { this.nextGen(); }
               }
               this.lastUpdate = performance.now();
             }
@@ -155,8 +185,7 @@ function Game(updateDur) {
 
   }; // end update
 
-}
-
+} // end myGame
 
 //////////////////////////////////////////////////////////////////////////////////
 // GAME LOOP
@@ -166,7 +195,7 @@ function gameLoop(timestamp) {
   // timestamp uses performance.now() to compute the time
   State.myReq = requestAnimationFrame(gameLoop);
 
-  if ( (State.loopRunning === true) && (State.gameStarted === true) ) { myGame.update();  }
+  if ( (State.loopRunning === true) && (State.gameStarted === true) ) { myGame.update(); }
 
   clearCanvas();
   if (State.gameStarted === false) {
@@ -201,6 +230,19 @@ function generalLoopReset() {
   State.myReq = requestAnimationFrame(gameLoop);
 }
 
+function mDown(evt) {
+  if (myGame.mode === "draw") {
+    console.log('mouse down and drawing box');
+    if (evt.button === 0) {  // left-click
+      myGame.paintBox();
+    } else if (evt.button === 2) { // right-click
+      myGame.eraseBox();
+    }
+  } else {
+    console.log('game not in draw mode');
+  }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $(document).ready(function() {
@@ -208,6 +250,8 @@ $(document).ready(function() {
   CANVAS =  $('#canvas')[0];
   ctx =  CANVAS.getContext('2d');
   // CANVAS.addEventListener('keydown',keyDown,false);
+  canvas.addEventListener("mousedown", mDown, false);
+  $('body').on('contextmenu', '#canvas', function(e){ return false; }); // prevent right click context menu default action
 
   // this is to correct for canvas blurryness on single pixel wide lines etc
   // this is extremely important when animating to reduce rendering artifacts and other oddities
@@ -229,11 +273,17 @@ $(document).ready(function() {
       $("#coords-y").text(State.mouseY);
   }, false);
 
-  $('#start-btn').click(function() {
-    console.log("start button clicked");
+  $('#init-btn').click(function() {
+    console.log("init button clicked");
     generalLoopReset();
     State.loopRunning = true;
     State.gameStarted = true;
+    myGame.mode = 'draw';
+  });
+
+  $('#start-btn').click(function() {
+    console.log("start button clicked");
+    myGame.mode = 'sim';
   });
 
   $('#reset-btn').click(function() {

@@ -42,8 +42,8 @@ body {
 }
 
 .debug-container {
-  width: 212px;
-  height: 28px;
+  width: 200px;
+  height: auto;
   margin: 10px auto 0px auto;
   /* outline-color: green;
   outline-style: solid;
@@ -51,8 +51,10 @@ body {
 }
 
 #coords {
+  text-align: center;
   font-family: monospace;
-  font-size: 20px;
+  font-size: 24px;
+
 }
 #coords-x {
 
@@ -69,4 +71,17 @@ body {
 }
 #canvas {
   margin: 20px auto;
+}
+
+footer {
+  margin: 20px auto auto auto;
+}
+.social-container {
+  width: 70px;
+  height: 70px;
+  margin: 0px auto;
+}
+#git-img {
+  height: 70px;
+  width: 70px;
 }

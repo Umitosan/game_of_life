@@ -11,6 +11,7 @@ var State = {
   gameStarted: false,
   lastFrameTimeMs: 0, // The last time the loop was run
   maxFPS: 60, // The maximum FPS allowed
+  simSpeed: 200, // speed of simulation loop
   playTime: 0,
   frameCounter: 0,
   lastKey: 'none',
@@ -28,6 +29,7 @@ function Colors() {
   this.lighterGreyReset = 'rgb(240,240,240)';
   this.white = 'rgba(250, 250, 250, 1)';
   this.red = 'rgba(230, 0, 0, 1)';
+  this.cherry = 'rgba(242,47,8,1)';
   this.green = 'rgba(0, 230, 0, 1)';
   this.blue = 'rgba(0, 0, 230, 1)';
 }
@@ -41,6 +43,7 @@ function softReset() {
     gameStarted: false,
     lastFrameTimeMs: 0, // The last time the loop was run
     maxFPS: 60, // The maximum FPS allowed
+    simSpeed: 200, // speed of simulation loop
     playTime: 0,
     frameCounter: 0,
     lastKey: 'none',
@@ -57,9 +60,10 @@ function Box(x,y,color,size) {
   this.y = y;
   this.color = color;
   this.size =  size;
+  this.prevStatus = 'off';
+  this.curStatus = 'off';
 
   this.draw = function() {
-    // console.log('box draw');
     ctx.beginPath();
     ctx.rect(this.x,this.y,this.size,this.size);
     ctx.fillStyle = this.color;
@@ -85,7 +89,6 @@ function Game(updateDur) {
   this.mode = 'init';
   this.boxColorOn = myColors.green;
   this.boxColorOff = myColors.red;
-
 
   this.init = function() {
     this.bg.src = 'bg1.png';
@@ -118,26 +121,108 @@ function Game(updateDur) {
     let r = Math.floor(State.mouseY / (this.boxSize+1));
     // console.log('box clicked: Col='+c+"  Row="+r);
     this.grid[r][c].color = myColors.blue;
+    this.grid[r][c].curStatus = 'on';
+    this.grid[r][c].prevStatus = 'on';
   };
   this.eraseBox = function() {
     let c = Math.floor(State.mouseX / (this.boxSize+1));
     let r = Math.floor(State.mouseY / (this.boxSize+1));
     this.grid[r][c].color = myColors.white;
+    this.grid[r][c].curStatus = 'off';
+    this.grid[r][c].prevStatus = 'off';
   };
 
-  this.nextGen = function() { // update board colors for next generation of sim
+  this.nextGen = function() {
+    this.cellFate(); // calculate life and death of each cell
+    this.colorNextGen(); // update the colors of each cell
+    console.log('nextGen');
+    // console.log('grid = ', this.grid);
+  }; // end sim
+
+  this.cellFate = function() {
+    // Any live cell with fewer than two live neighbors dies, as if by under population.
+    // Any live cell with two or three live neighbors lives on to the next generation.
+    // Any live cell with more than three live neighbors dies, as if by overpopulation.
+    // Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+
     for (let c = 0; c < this.gridWidth-1; c++) {
       for (let r = 0; r < this.gridHeight-1; r++) {
-        if (this.grid[r][c].color === myColors.white) {
+        this.grid[r][c].prevStatus = this.grid[r][c].curStatus;
+      }
+    }
+    for (let c = 0; c < this.gridWidth-1; c++) {
+      for (let r = 0; r < this.gridHeight-1; r++) {
+        let count = this.countAdjacentCellStatus(r,c);
+        if (count < 2) { // die
+          this.grid[r][c].curStatus = 'off';
+        } else if ( (count === 2) || (count === 3) ) { // live
+          this.grid[r][c].curStatus = 'on';
+          // console.log('cell turned on');
+        } else if (count > 3) { // die
+          this.grid[r][c].curStatus = 'off';
+        } else {
+          // nothin
+        }
+      } // for
+    } // for
+  };
+
+  this.countAdjacentCellStatus = function(row,col) {
+    let r = row;
+    let c = col;
+    let count = 0; // set to random for visual static getRandomIntInclusive(0,3)
+
+    // up left
+    if ((r !== 0) && (c !== 0)) {
+      if (this.grid[r-1][c-1].prevStatus === 'on') { count += 1; }
+    }
+    // up
+    if (r !== 0) {
+      if (this.grid[r-1][c].prevStatus === 'on') { count += 1; }
+    }
+    // up right
+    if ((r !== 0) && (c < this.gridWidth-1)) {
+      if (this.grid[r-1][c+1].prevStatus === 'on') { count += 1; }
+    }
+
+    // left
+    if (c !== 0) {
+      if (this.grid[r][c-1].prevStatus === 'on') { count += 1; }
+    }
+    // right
+    if (c < this.gridWidth-1) {
+      if (this.grid[r][c+1].prevStatus === 'on') { count += 1; }
+    }
+
+    // down right
+    if ((r < this.gridHeight-1) && (c < this.gridWidth-1)) {
+      if (this.grid[r+1][c+1].prevStatus === 'on') { count += 1; }
+    }
+    // down
+    if (r < this.gridHeight-1) {
+      if (this.grid[r+1][c].prevStatus === 'on') { count += 1; }
+    }
+    // down left
+    if ((r < this.gridHeight-1) && (c !== 0)) {
+      if (this.grid[r+1][c-1].prevStatus === 'on') { count += 1; }
+    }
+    return count;
+  };
+
+  this.colorNextGen = function() {
+    console.log('colorNextGen run');
+    for (let c = 0; c < this.gridWidth-1; c++) {
+      for (let r = 0; r < this.gridHeight-1; r++) {
+        if (this.grid[r][c].curStatus === "on") {
           this.grid[r][c].color = myColors.blue;
-        } else if (this.grid[r][c].color === myColors.blue) {
+        } else if (this.grid[r][c].curStatus === "off") {
           this.grid[r][c].color = myColors.white;
         } else {
-          console.log('grid color prob');
+          console.log('colorNextGen prob');
         }
       }
     }
-  }; // end sim
+  };
 
   this.pauseIt = function() {
     console.log('GAME paused');
@@ -153,10 +238,11 @@ function Game(updateDur) {
     this.timeGap = 0;
   };
 
-  this.drawBG = function() {
+  this.drawBG = function() { // display background over canvas
     ctx.imageSmoothingEnabled = false;  // turns off AntiAliasing
     ctx.drawImage(this.bg,4,4,CANVAS.width-9,CANVAS.height-9);
   };
+
   this.draw = function() {
     for (let c = 0; c < this.gridWidth-1; c++) {
       for (let r = 0; r < this.gridHeight-1; r++) {
@@ -221,7 +307,7 @@ function generalLoopReset() {
     cancelAnimationFrame(State.myReq);
     softReset();
   }
-  myGame = new Game(500); // ms per update()
+  myGame = new Game(State.simSpeed); // ms per update()
   myGame.init();
   State.myReq = requestAnimationFrame(gameLoop);
 }
@@ -286,19 +372,6 @@ $(document).ready(function() {
   canvas.addEventListener("mousedown", mDown, false);
   canvas.addEventListener("mouseup", mUp, false);
   $('body').on('contextmenu', '#canvas', function(e){ return false; }); // prevent right click context menu default action
-
-  // this is to correct for canvas blurryness on single pixel wide lines etc
-  // this is extremely important when animating to reduce rendering artifacts and other oddities
-  ctx.translate(0.5, 0.5);
-
-  // start things up so that the background image can be drawn
-  myGame = new Game(500);
-  myGame.init();
-  State.loopRunning = true;
-  myGame.drawBG();
-  State.myReq = requestAnimationFrame(gameLoop);
-
-  // mouse move on canvas event
   canvas.addEventListener('mousemove', function(evt) {
     let rect = CANVAS.getBoundingClientRect();
       State.mouseX = evt.clientX - rect.left;
@@ -307,25 +380,29 @@ $(document).ready(function() {
       $("#coords-y").text(State.mouseY);
   }, false);
 
-  $('#init-btn').click(function() {
-    console.log("init button clicked");
-    generalLoopReset();
-    State.loopRunning = true;
-    State.gameStarted = true;
-    myGame.mode = 'draw';
-  });
+  // this is to correct for canvas blurryness on single pixel wide lines etc
+  // important when animating to reduce rendering artifacts and other oddities
+  ctx.translate(0.5, 0.5);
+
+  // start things up!
+  generalLoopReset();
+  State.loopRunning = true;
+  State.gameStarted = true;
+  myGame.mode = 'draw';
+
 
   $('#start-btn').click(function() {
     console.log("start button clicked");
-    myGame.mode = 'sim';
     myGame.simStart = performance.now();
+    myGame.mode = 'sim';
   });
 
   $('#reset-btn').click(function() {
     console.log("reset button clicked");
     generalLoopReset();
     State.loopRunning = true;
-    State.gameStarted = false;
+    State.gameStarted = true;
+    myGame.mode = 'draw';
   });
 
   $('#pause-btn').click(function() {

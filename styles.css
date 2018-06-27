@@ -1,7 +1,7 @@
 
 body {
   margin: 0px 0px;
-  background-color: lightgrey;
+  background-color: rgba(100,145,140,1);
 }
 
 .main-container {
@@ -24,7 +24,7 @@ body {
 }
 
 .buttons-container {
-  width: 212px;
+  width: 158px;
   height: 100%;
   margin: 0px auto;
   /* outline-color: green;
@@ -71,6 +71,10 @@ body {
 }
 #canvas {
   margin: 20px auto;
+  background-color: lightblue;
+  /* outline-color: red;
+  outline-style: solid;
+  outline-width: 1px; */
 }
 
 footer {

@@ -15,7 +15,9 @@ var State = {
   frameCounter: 0,
   lastKey: 'none',
   mouseX: 0,
-  mouseY: 0
+  mouseY: 0,
+  mouseLeftDown: false,
+  mouseRightDown: false
 };
 
 function Colors() {
@@ -27,11 +29,11 @@ function Colors() {
   this.white = 'rgba(250, 250, 250, 1)';
   this.red = 'rgba(230, 0, 0, 1)';
   this.green = 'rgba(0, 230, 0, 1)';
-  this.blue = 'rgba(0, 0, 230, 0.7)';
+  this.blue = 'rgba(0, 0, 230, 1)';
 }
 
 function softReset() {
-  console.log('soft reset run');
+  console.log('soft reset!');
   myGame = undefined;
   State = {
     myReq: undefined,
@@ -41,8 +43,13 @@ function softReset() {
     maxFPS: 60, // The maximum FPS allowed
     playTime: 0,
     frameCounter: 0,
-    lastKey: 'none'
+    lastKey: 'none',
+    mouseX: 0,
+    mouseY: 0,
+    mouseLeftDown: false,
+    mouseRightDown: false
   };
+
 }
 
 function Box(x,y,color,size) {
@@ -76,8 +83,9 @@ function Game(updateDur) {
   this.curBoxC = 0;
   this.curBoxR = 0;
   this.mode = 'init';
-  // this.simSpeed = 500; // milliseconds duration between game generations
-  // this.simStart = 0;
+  this.boxColorOn = myColors.green;
+  this.boxColorOff = myColors.red;
+
 
   this.init = function() {
     this.bg.src = 'bg1.png';
@@ -92,18 +100,18 @@ function Game(updateDur) {
     this.lastUpdate = performance.now();
   };
 
-  this.moveBox = function() {
-    if (this.curBoxC === (this.gridWidth-1)) {
-      this.grid[this.curBoxR][this.curBoxC].color = myColors.white;
-      this.curBoxC = 0;
-      this.curBoxR += 1;
-      this.grid[this.curBoxR][this.curBoxC].color = myColors.blue;
-    } else {
-      this.grid[this.curBoxR][this.curBoxC].color = myColors.white;
-      this.curBoxC += 1;
-      this.grid[this.curBoxR][this.curBoxC].color = myColors.blue;
-    }
-  };
+  // this.moveBox = function() {
+  //   if (this.curBoxC === (this.gridWidth-1)) {
+  //     this.grid[this.curBoxR][this.curBoxC].color = this.boxColorOff;
+  //     this.curBoxC = 0;
+  //     this.curBoxR += 1;
+  //     this.grid[this.curBoxR][this.curBoxC].color = this.boxColorOn;
+  //   } else {
+  //     this.grid[this.curBoxR][this.curBoxC].color = this.boxColorOff;
+  //     this.curBoxC += 1;
+  //     this.grid[this.curBoxR][this.curBoxC].color =  this.boxColorOn;
+  //   }
+  // };
 
   this.paintBox = function() {
     let c = Math.floor(State.mouseX / (this.boxSize+1));
@@ -136,7 +144,6 @@ function Game(updateDur) {
     myGame.paused = true;
     // this.pausedTxt.show = true;
   };
-
   this.unpauseIt = function() {
     console.log('GAME un-paused');
     myGame.paused = false;
@@ -150,45 +157,43 @@ function Game(updateDur) {
     ctx.imageSmoothingEnabled = false;  // turns off AntiAliasing
     ctx.drawImage(this.bg,4,4,CANVAS.width-9,CANVAS.height-9);
   };
-
   this.draw = function() {
-
     for (let c = 0; c < this.gridWidth-1; c++) {
       for (let r = 0; r < this.gridHeight-1; r++) {
         this.grid[r][c].draw();
       }
     }
-
   }; // end draw
 
 
   this.update = function() {
       if (this.paused === false) { // performance based update: myGame.update() runs every myGame.updateDuration milliseconds
-
-        // if (State.playTime < 1) { // make sure on first update() only run once
-        //   this.lastUpdate = performance.now();
-        //   this.timeGap = 0;
-        // } else {
-        //   this.timeGap = performance.now() - this.lastUpdate;
-        // }
-
             this.timeGap = performance.now() - this.lastUpdate;
 
-            if ( this.timeGap >= this.updateDuration ) {
-                  // console.log('update run');
+            if ( this.timeGap >= this.updateDuration ) { // this update is restricted to updateDuration
               let timesToUpdate = this.timeGap / this.updateDuration;
-                // console.log('times to update = ', timesToUpdate);
-              for (let i=1; i < timesToUpdate; i++) {
-                // update children objects
+              for (let i=1; i < timesToUpdate; i++) { // update children objects
                 if (this.mode === 'sim') {
                   this.nextGen();
                 }
-             }
+              }
               this.lastUpdate = performance.now();
+            } // end if
+
+            if (this.mode === "draw") { // run this every update cycle regardless of timing
+              if (State.mouseLeftDown) {
+                // console.log('painting');
+                this.paintBox();
+              } else if (State.mouseRightDown) {
+                // console.log('erasing');
+                this.eraseBox();
+              }
+            } else {
+              // mode is none
             }
 
       } else if (this.paused === true) {
-        // do nothin
+        // PAUSED! do nothin
       } else {
         console.log('game pause issue');
       }
@@ -196,25 +201,6 @@ function Game(updateDur) {
   }; // end update
 
 } // end myGame
-
-//////////////////////////////////////////////////////////////////////////////////
-// GAME LOOP
-//////////////////////////////////////////////////////////////////////////////////
-function gameLoop(timestamp) {
-  // timestamp is automatically returnd from requestAnimationFrame
-  // timestamp uses performance.now() to compute the time
-  State.myReq = requestAnimationFrame(gameLoop);
-
-  if ( (State.loopRunning === true) && (State.gameStarted === true) ) { myGame.update(); }
-
-  clearCanvas();
-  if (State.gameStarted === false) {
-    myGame.drawBG();
-  } else {
-    myGame.draw();
-  }
-
-}
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -240,19 +226,56 @@ function generalLoopReset() {
   State.myReq = requestAnimationFrame(gameLoop);
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+// MOUSE INPUT
+//////////////////////////////////////////////////////////////////////////////////
 function mDown(evt) {
   if (myGame.mode === "draw") {
-    console.log('mouse down and drawing box');
     if (evt.button === 0) {  // left-click
-      myGame.paintBox();
+      // console.log('MOUSE: left down');
+      if (State.mouseRightDown === false) { State.mouseLeftDown = true; } // only allow one mouse button down at a time, ignore change if both are down
     } else if (evt.button === 2) { // right-click
-      myGame.eraseBox();
+      // console.log('MOUSE: right down');
+      if (State.mouseLeftDown === false) { State.mouseRightDown = true; }
     }
   } else {
     console.log('game not in draw mode');
   }
 }
 
+function mUp(evt) {
+  if (myGame.mode === "draw") {
+    if (evt.button === 0) {  // left-click
+      // console.log('MOUSE: left up');
+      State.mouseLeftDown = false;
+    } else if (evt.button === 2) { // right-click
+      // console.log('MOUSE: left up');
+      State.mouseRightDown = false;
+    }
+  } else {
+    console.log('game not in draw mode');
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// GAME LOOP
+//////////////////////////////////////////////////////////////////////////////////
+function gameLoop(timestamp) {
+  // timestamp is automatically returnd from requestAnimationFrame
+  // timestamp uses performance.now() to compute the time
+  State.myReq = requestAnimationFrame(gameLoop);
+
+  if ( (State.loopRunning === true) && (State.gameStarted === true) ) { myGame.update(); }
+
+  clearCanvas();
+  if (State.gameStarted === false) {
+    myGame.drawBG();
+  } else {
+    myGame.draw();
+  }
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $(document).ready(function() {
@@ -261,6 +284,7 @@ $(document).ready(function() {
   ctx =  CANVAS.getContext('2d');
   // CANVAS.addEventListener('keydown',keyDown,false);
   canvas.addEventListener("mousedown", mDown, false);
+  canvas.addEventListener("mouseup", mUp, false);
   $('body').on('contextmenu', '#canvas', function(e){ return false; }); // prevent right click context menu default action
 
   // this is to correct for canvas blurryness on single pixel wide lines etc

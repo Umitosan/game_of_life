@@ -5,13 +5,15 @@ var CANVAS,
     myGame;
 var myColors = new Colors();
 
+var defaultSimSpeed = 400;
+
 var State = {
   myReq: undefined,
   loopRunning: false,
   gameStarted: false,
   lastFrameTimeMs: 0, // The last time the loop was run
   maxFPS: 60, // The maximum FPS allowed
-  simSpeed: 200, // speed of simulation loop
+  simSpeed: defaultSimSpeed, // speed of simulation loop
   playTime: 0,
   frameCounter: 0,
   lastKey: 'none',
@@ -20,6 +22,27 @@ var State = {
   mouseLeftDown: false,
   mouseRightDown: false
 };
+
+function softReset() {
+  console.log('soft reset!');
+  myGame = undefined;
+  State = {
+    myReq: undefined,
+    loopRunning: false,
+    gameStarted: false,
+    lastFrameTimeMs: 0, // The last time the loop was run
+    maxFPS: 60, // The maximum FPS allowed
+    simSpeed: defaultSimSpeed, // speed of simulation loop
+    playTime: 0,
+    frameCounter: 0,
+    lastKey: 'none',
+    mouseX: 0,
+    mouseY: 0,
+    mouseLeftDown: false,
+    mouseRightDown: false
+  };
+
+}
 
 function Colors() {
   this.black = 'rgba(0, 0, 0, 1)';
@@ -34,26 +57,7 @@ function Colors() {
   this.blue = 'rgba(0, 0, 230, 1)';
 }
 
-function softReset() {
-  console.log('soft reset!');
-  myGame = undefined;
-  State = {
-    myReq: undefined,
-    loopRunning: false,
-    gameStarted: false,
-    lastFrameTimeMs: 0, // The last time the loop was run
-    maxFPS: 60, // The maximum FPS allowed
-    simSpeed: 200, // speed of simulation loop
-    playTime: 0,
-    frameCounter: 0,
-    lastKey: 'none',
-    mouseX: 0,
-    mouseY: 0,
-    mouseLeftDown: false,
-    mouseRightDown: false
-  };
 
-}
 
 function Box(x,y,color,size) {
   this.x = x;
@@ -153,16 +157,23 @@ function Game(updateDur) {
     for (let c = 0; c < this.gridWidth-1; c++) {
       for (let r = 0; r < this.gridHeight-1; r++) {
         let count = this.countAdjacentCellStatus(r,c);
-        if (count < 2) { // die
-          this.grid[r][c].curStatus = 'off';
-        } else if ( (count === 2) || (count === 3) ) { // live
+
+        if (this.grid[r][c].prevStatus === 'on') { // die
+          if (count < 2) {
+            this.grid[r][c].curStatus = 'off';
+          } else if ((count === 2) || (count === 3)) { // live
+            this.grid[r][c].curStatus = 'on';
+          } else if (count > 3) { // die
+            this.grid[r][c].curStatus = 'off';
+          } else {
+            // nothin
+          }
+        } else if ( (count === 3) && (this.grid[r][c].curStatus === 'off') ) { // live
           this.grid[r][c].curStatus = 'on';
-          // console.log('cell turned on');
-        } else if (count > 3) { // die
-          this.grid[r][c].curStatus = 'off';
-        } else {
+        } else  {
           // nothin
         }
+
       } // for
     } // for
   };

@@ -5,7 +5,7 @@ var CANVAS,
     myGame;
 var myColors = new Colors();
 
-var defaultSimSpeed = 400;
+var defaultSimSpeed = 100;
 
 var State = {
   myReq: undefined,
@@ -57,7 +57,46 @@ function Colors() {
   this.blue = 'rgba(0, 0, 230, 1)';
 }
 
-
+var examples = {
+  "gliderGun":  [
+      {row: 5, col: 1},
+      {row: 6, col: 1},
+      {row: 5, col: 2},
+      {row: 6, col: 2},
+      {row: 5, col: 11},
+      {row: 6, col: 11},
+      {row: 7, col: 11},
+      {row: 4, col: 12},
+      {row: 8, col: 12},
+      {row: 3, col: 13},
+      {row: 9, col: 13},
+      {row: 3, col: 14},
+      {row: 9, col: 14},
+      {row: 6, col: 15},
+      {row: 4, col: 16},
+      {row: 8, col: 16},
+      {row: 5, col: 17},
+      {row: 6, col: 17},
+      {row: 7, col: 17},
+      {row: 6, col: 18},
+      {row: 3, col: 21},
+      {row: 4, col: 21},
+      {row: 5, col: 21},
+      {row: 3, col: 22},
+      {row: 4, col: 22},
+      {row: 5, col: 22},
+      {row: 2, col: 23},
+      {row: 6, col: 23},
+      {row: 1, col: 25},
+      {row: 2, col: 25},
+      {row: 6, col: 25},
+      {row: 7, col: 25},
+      {row: 3, col: 35},
+      {row: 4, col: 35},
+      {row: 3, col: 36},
+      {row: 4, col: 36}
+  ]
+};
 
 function Box(x,y,color,size) {
   this.x = x;
@@ -120,17 +159,43 @@ function Game(updateDur) {
   //   }
   // };
 
+  this.getOnList = function() {
+    let list = [];
+    for (let c = 0; c < this.gridWidth-1; c++) {
+      for (let r = 0; r < this.gridHeight-1; r++) {
+        if (this.grid[r][c].curStatus === 'on') {
+          list.push( {"row":r, "col":c});
+        }
+      }
+    }
+    return list;
+  };
+
+  this.loadExample = function(name) {
+    if (examples[name] !== undefined) {
+      let e = examples[name];
+      for (let i = 0; i < e.length; i++) {
+        let r = e[i].row;
+        let c = e[i].col;
+        this.grid[r][c].curStatus = 'on';
+      }
+    } else {
+      console.log('example not found');
+    }
+    this.colorNextGen(); // color the board after status updated
+  };
+
   this.paintBox = function() {
-    let c = Math.floor(State.mouseX / (this.boxSize+1));
-    let r = Math.floor(State.mouseY / (this.boxSize+1));
+    let c = Math.floor( (State.mouseX-2) / (this.boxSize+1) ); // small offsets are for... 1.canvas border  2.the divider lines between boxes
+    let r = Math.floor( (State.mouseY-2) / (this.boxSize+1) );
     // console.log('box clicked: Col='+c+"  Row="+r);
     this.grid[r][c].color = myColors.blue;
     this.grid[r][c].curStatus = 'on';
     this.grid[r][c].prevStatus = 'on';
   };
   this.eraseBox = function() {
-    let c = Math.floor(State.mouseX / (this.boxSize+1));
-    let r = Math.floor(State.mouseY / (this.boxSize+1));
+    let c = Math.floor( (State.mouseX-2) / (this.boxSize+1) ); // small offsets are for... 1.canvas border  2.the divider lines between boxes
+    let r = Math.floor( (State.mouseY-2) / (this.boxSize+1) );
     this.grid[r][c].color = myColors.white;
     this.grid[r][c].curStatus = 'off';
     this.grid[r][c].prevStatus = 'off';
@@ -139,7 +204,7 @@ function Game(updateDur) {
   this.nextGen = function() {
     this.cellFate(); // calculate life and death of each cell
     this.colorNextGen(); // update the colors of each cell
-    console.log('nextGen');
+    // console.log('nextGen');
     // console.log('grid = ', this.grid);
   }; // end sim
 
@@ -221,7 +286,7 @@ function Game(updateDur) {
   };
 
   this.colorNextGen = function() {
-    console.log('colorNextGen run');
+    // console.log('colorNextGen run');
     for (let c = 0; c < this.gridWidth-1; c++) {
       for (let r = 0; r < this.gridHeight-1; r++) {
         if (this.grid[r][c].curStatus === "on") {
@@ -236,12 +301,12 @@ function Game(updateDur) {
   };
 
   this.pauseIt = function() {
-    console.log('GAME paused');
+    // console.log('GAME paused');
     myGame.paused = true;
     // this.pausedTxt.show = true;
   };
   this.unpauseIt = function() {
-    console.log('GAME un-paused');
+    // console.log('GAME un-paused');
     myGame.paused = false;
     // this.pausedTxt.show = false;
     // this prevents pac from updating many times after UNpausing
@@ -384,7 +449,7 @@ $(document).ready(function() {
   canvas.addEventListener("mouseup", mUp, false);
   $('body').on('contextmenu', '#canvas', function(e){ return false; }); // prevent right click context menu default action
   canvas.addEventListener('mousemove', function(evt) {
-    let rect = CANVAS.getBoundingClientRect();
+      let rect = CANVAS.getBoundingClientRect();
       State.mouseX = evt.clientX - rect.left;
       State.mouseY = evt.clientY - rect.top;
       $("#coords-x").text(State.mouseX);
@@ -393,7 +458,8 @@ $(document).ready(function() {
 
   // this is to correct for canvas blurryness on single pixel wide lines etc
   // important when animating to reduce rendering artifacts and other oddities
-  ctx.translate(0.5, 0.5);
+  // ctx.translate(0.5, 0.5);
+  ctx.translate(1, 1);
 
   // start things up!
   generalLoopReset();
@@ -401,11 +467,14 @@ $(document).ready(function() {
   State.gameStarted = true;
   myGame.mode = 'draw';
 
-
   $('#start-btn').click(function() {
     console.log("start button clicked");
-    myGame.simStart = performance.now();
-    myGame.mode = 'sim';
+    if (myGame.mode === 'draw') {
+      myGame.simStart = performance.now();
+      myGame.mode = 'sim';
+    } else {
+      console.log('must reset before starting again');
+    }
   });
 
   $('#reset-btn').click(function() {
@@ -423,6 +492,10 @@ $(document).ready(function() {
     } else if (myGame.paused === true) {
       myGame.unpauseIt();
     }
+  });
+
+  $('#glider-gun').click(function(e) {
+    myGame.loadExample("gliderGun");
   });
 
 });

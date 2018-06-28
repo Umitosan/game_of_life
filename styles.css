@@ -77,6 +77,28 @@ body {
   outline-width: 1px; */
 }
 
+
+.example-container {
+  margin: 10px auto 10px auto;
+  font-family: sans-serif;
+  text-align: center;
+}
+.example img {
+  border-width: 0px;
+  border-color: none;
+  border-style: none;
+  border-radius: 0px;
+}
+.example img:hover {
+  border-radius: 40px;
+  transition: border-radius 200ms;
+}
+.element {
+
+}
+
+
+
 footer {
   margin: 20px auto auto auto;
 }

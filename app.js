@@ -95,6 +95,56 @@ var examples = {
       {row: 4, col: 35},
       {row: 3, col: 36},
       {row: 4, col: 36}
+  ],
+  "koksGalexy": [
+      {row: 26, col: 30},
+      {row: 27, col: 30},
+      {row: 28, col: 30},
+      {row: 29, col: 30},
+      {row: 30, col: 30},
+      {row: 31, col: 30},
+      {row: 33, col: 30},
+      {row: 34, col: 30},
+      {row: 26, col: 31},
+      {row: 27, col: 31},
+      {row: 28, col: 31},
+      {row: 29, col: 31},
+      {row: 30, col: 31},
+      {row: 31, col: 31},
+      {row: 33, col: 31},
+      {row: 34, col: 31},
+      {row: 33, col: 32},
+      {row: 34, col: 32},
+      {row: 26, col: 33},
+      {row: 27, col: 33},
+      {row: 33, col: 33},
+      {row: 34, col: 33},
+      {row: 26, col: 34},
+      {row: 27, col: 34},
+      {row: 33, col: 34},
+      {row: 34, col: 34},
+      {row: 26, col: 35},
+      {row: 27, col: 35},
+      {row: 33, col: 35},
+      {row: 34, col: 35},
+      {row: 26, col: 36},
+      {row: 27, col: 36},
+      {row: 26, col: 37},
+      {row: 27, col: 37},
+      {row: 29, col: 37},
+      {row: 30, col: 37},
+      {row: 31, col: 37},
+      {row: 32, col: 37},
+      {row: 33, col: 37},
+      {row: 34, col: 37},
+      {row: 26, col: 38},
+      {row: 27, col: 38},
+      {row: 29, col: 38},
+      {row: 30, col: 38},
+      {row: 31, col: 38},
+      {row: 32, col: 38},
+      {row: 33, col: 38},
+      {row: 34, col: 38}
   ]
 };
 
@@ -167,6 +217,10 @@ function Game(updateDur) {
           list.push( {"row":r, "col":c});
         }
       }
+    }
+    // console.log("{'row':"+r+", 'col':"+c+"}");
+    for (let i = 0; i < list.length; i++) {
+        console.log(list[i]);
     }
     return list;
   };

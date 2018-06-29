@@ -55,6 +55,7 @@ function Colors() {
   this.cherry = 'rgba(242,47,8,1)';
   this.green = 'rgba(0, 230, 0, 1)';
   this.blue = 'rgba(0, 0, 230, 1)';
+  this.electricBlue = 'rgba(20, 30, 230, 1)';
 }
 
 function Box(x,y,color,size) {
@@ -89,7 +90,7 @@ function Game(updateDur) {
   this.curBoxC = 0;
   this.curBoxR = 0;
   this.mode = 'init';
-  this.boxColorOn = myColors.blue;
+  this.boxColorOn = myColors.electricBlue;
   this.boxColorOff = myColors.white;
 
   this.init = function() {
@@ -135,6 +136,7 @@ function Game(updateDur) {
   };
 
   this.loadExample = function(name) {
+    this.clearGrid();  // reset boxes to white before example load up
     if (examples[name] !== undefined) {
       let e = examples[name];
       for (let i = 0; i < e.length; i++) {
@@ -277,6 +279,17 @@ function Game(updateDur) {
     this.timeGap = 0;
   };
 
+  this.clearGrid = function() {
+    console.log('clearGrid');
+    for (let c = 0; c < this.gridWidth-1; c++) {
+      for (let r = 0; r < this.gridHeight-1; r++) {
+        this.grid[r][c].color = this.boxColorOff;
+        this.grid[r][c].curStatus = 'off';
+        this.grid[r][c].prevStatus = 'off';
+      }
+    }
+  };
+
   this.drawBG = function() { // display background over canvas
     ctx.imageSmoothingEnabled = false;  // turns off AntiAliasing
     ctx.drawImage(this.bg,4,4,CANVAS.width-9,CANVAS.height-9);
@@ -289,7 +302,6 @@ function Game(updateDur) {
       }
     }
   }; // end draw
-
 
   this.update = function() {
       if (this.paused === false) { // performance based update: myGame.update() runs every myGame.updateDuration milliseconds

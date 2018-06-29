@@ -1,7 +1,9 @@
 
 body {
   margin: 0px 0px;
-  background-color: rgba(100,145,140,1);
+  background-color: rgba(102,150,142,1);
+  /* background-color: rgba(153,255,204,1); */
+  /* background-color: lightblue; */
 }
 
 .main-container {
@@ -83,6 +85,9 @@ body {
   font-family: sans-serif;
   text-align: center;
 }
+.example {
+  margin: 0px auto 26px auto;
+}
 .example img {
   border-width: 0px;
   border-color: none;
@@ -92,9 +97,6 @@ body {
 .example img:hover {
   border-radius: 40px;
   transition: border-radius 200ms;
-}
-.element {
-
 }
 
 

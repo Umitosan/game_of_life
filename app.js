@@ -57,97 +57,6 @@ function Colors() {
   this.blue = 'rgba(0, 0, 230, 1)';
 }
 
-var examples = {
-  "gliderGun":  [
-      {row: 5, col: 1},
-      {row: 6, col: 1},
-      {row: 5, col: 2},
-      {row: 6, col: 2},
-      {row: 5, col: 11},
-      {row: 6, col: 11},
-      {row: 7, col: 11},
-      {row: 4, col: 12},
-      {row: 8, col: 12},
-      {row: 3, col: 13},
-      {row: 9, col: 13},
-      {row: 3, col: 14},
-      {row: 9, col: 14},
-      {row: 6, col: 15},
-      {row: 4, col: 16},
-      {row: 8, col: 16},
-      {row: 5, col: 17},
-      {row: 6, col: 17},
-      {row: 7, col: 17},
-      {row: 6, col: 18},
-      {row: 3, col: 21},
-      {row: 4, col: 21},
-      {row: 5, col: 21},
-      {row: 3, col: 22},
-      {row: 4, col: 22},
-      {row: 5, col: 22},
-      {row: 2, col: 23},
-      {row: 6, col: 23},
-      {row: 1, col: 25},
-      {row: 2, col: 25},
-      {row: 6, col: 25},
-      {row: 7, col: 25},
-      {row: 3, col: 35},
-      {row: 4, col: 35},
-      {row: 3, col: 36},
-      {row: 4, col: 36}
-  ],
-  "koksGalexy": [
-      {row: 26, col: 30},
-      {row: 27, col: 30},
-      {row: 28, col: 30},
-      {row: 29, col: 30},
-      {row: 30, col: 30},
-      {row: 31, col: 30},
-      {row: 33, col: 30},
-      {row: 34, col: 30},
-      {row: 26, col: 31},
-      {row: 27, col: 31},
-      {row: 28, col: 31},
-      {row: 29, col: 31},
-      {row: 30, col: 31},
-      {row: 31, col: 31},
-      {row: 33, col: 31},
-      {row: 34, col: 31},
-      {row: 33, col: 32},
-      {row: 34, col: 32},
-      {row: 26, col: 33},
-      {row: 27, col: 33},
-      {row: 33, col: 33},
-      {row: 34, col: 33},
-      {row: 26, col: 34},
-      {row: 27, col: 34},
-      {row: 33, col: 34},
-      {row: 34, col: 34},
-      {row: 26, col: 35},
-      {row: 27, col: 35},
-      {row: 33, col: 35},
-      {row: 34, col: 35},
-      {row: 26, col: 36},
-      {row: 27, col: 36},
-      {row: 26, col: 37},
-      {row: 27, col: 37},
-      {row: 29, col: 37},
-      {row: 30, col: 37},
-      {row: 31, col: 37},
-      {row: 32, col: 37},
-      {row: 33, col: 37},
-      {row: 34, col: 37},
-      {row: 26, col: 38},
-      {row: 27, col: 38},
-      {row: 29, col: 38},
-      {row: 30, col: 38},
-      {row: 31, col: 38},
-      {row: 32, col: 38},
-      {row: 33, col: 38},
-      {row: 34, col: 38}
-  ]
-};
-
 function Box(x,y,color,size) {
   this.x = x;
   this.y = y;
@@ -180,8 +89,8 @@ function Game(updateDur) {
   this.curBoxC = 0;
   this.curBoxR = 0;
   this.mode = 'init';
-  this.boxColorOn = myColors.green;
-  this.boxColorOff = myColors.red;
+  this.boxColorOn = myColors.blue;
+  this.boxColorOff = myColors.white;
 
   this.init = function() {
     this.bg.src = 'bg1.png';
@@ -189,7 +98,7 @@ function Game(updateDur) {
     for (let r = 0; r < this.gridHeight; r++) {
       let tmpRow = [];
       for (let c = 0; c < this.gridWidth; c++) {
-        tmpRow.push( new Box((c*9)+(c+1),(r*9)+(r+1),myColors.white,this.boxSize)); // +1 is for 1 pixel gap between boxes
+        tmpRow.push( new Box((c*9)+(c+1),(r*9)+(r+1),this.boxColorOff,this.boxSize)); // +1 is for 1 pixel gap between boxes
       }
       this.grid.push(tmpRow);
     }
@@ -243,14 +152,14 @@ function Game(updateDur) {
     let c = Math.floor( (State.mouseX-2) / (this.boxSize+1) ); // small offsets are for... 1.canvas border  2.the divider lines between boxes
     let r = Math.floor( (State.mouseY-2) / (this.boxSize+1) );
     // console.log('box clicked: Col='+c+"  Row="+r);
-    this.grid[r][c].color = myColors.blue;
+    this.grid[r][c].color = this.boxColorOn;
     this.grid[r][c].curStatus = 'on';
     this.grid[r][c].prevStatus = 'on';
   };
   this.eraseBox = function() {
     let c = Math.floor( (State.mouseX-2) / (this.boxSize+1) ); // small offsets are for... 1.canvas border  2.the divider lines between boxes
     let r = Math.floor( (State.mouseY-2) / (this.boxSize+1) );
-    this.grid[r][c].color = myColors.white;
+    this.grid[r][c].color = this.boxColorOff;
     this.grid[r][c].curStatus = 'off';
     this.grid[r][c].prevStatus = 'off';
   };
@@ -344,9 +253,9 @@ function Game(updateDur) {
     for (let c = 0; c < this.gridWidth-1; c++) {
       for (let r = 0; r < this.gridHeight-1; r++) {
         if (this.grid[r][c].curStatus === "on") {
-          this.grid[r][c].color = myColors.blue;
+          this.grid[r][c].color = this.boxColorOn;
         } else if (this.grid[r][c].curStatus === "off") {
-          this.grid[r][c].color = myColors.white;
+          this.grid[r][c].color = this.boxColorOff;
         } else {
           console.log('colorNextGen prob');
         }
@@ -548,8 +457,12 @@ $(document).ready(function() {
     }
   });
 
+  // examples
   $('#glider-gun').click(function(e) {
     myGame.loadExample("gliderGun");
+  });
+  $('#koks-galexy').click(function(e) {
+    myGame.loadExample("koksGalexy");
   });
 
 });

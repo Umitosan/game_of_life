@@ -451,6 +451,9 @@ $(document).ready(function() {
     if (myGame.mode === 'draw') {
       myGame.simStart = performance.now();
       myGame.mode = 'sim';
+      let v = $('#speed-slider').val();
+      $('#speed-input').prop("value", v);
+      myGame.updateDuration = (1000/v);
     } else {
       console.log('must reset before starting again');
     }
@@ -486,7 +489,6 @@ $(document).ready(function() {
       $('#speed-input').prop("value", v);
       if (myGame.mode === 'sim') {
         myGame.updateDuration = (1000/v);
-        console.log('myGame.updateDuration changed = ', myGame.updateDuration);
       }
     }
   });

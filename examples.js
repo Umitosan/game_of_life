@@ -1,6 +1,36 @@
 /*jshint esversion: 6 */
 
 var examples = {
+  "custom1": [
+    {row: 27, col: 35},
+    {row: 28, col: 35},
+    {row: 29, col: 35},
+    {row: 30, col: 35},
+    {row: 31, col: 35},
+    {row: 27, col: 36},
+    {row: 31, col: 36},
+    {row: 27, col: 38},
+    {row: 31, col: 38},
+    {row: 27, col: 39},
+    {row: 28, col: 39},
+    {row: 29, col: 39},
+    {row: 30, col: 39},
+    {row: 31, col: 39},
+    {row: 27, col: 43},
+    {row: 28, col: 43},
+    {row: 29, col: 43},
+    {row: 30, col: 43},
+    {row: 31, col: 43},
+    {row: 27, col: 44},
+    {row: 31, col: 44},
+    {row: 27, col: 46},
+    {row: 31, col: 46},
+    {row: 27, col: 47},
+    {row: 28, col: 47},
+    {row: 29, col: 47},
+    {row: 30, col: 47},
+    {row: 31, col: 47}
+  ],
   "gliderGun":  [
       {row: 5, col: 1},
       {row: 6, col: 1},

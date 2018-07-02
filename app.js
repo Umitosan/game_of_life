@@ -441,6 +441,7 @@ $(document).ready(function() {
   State.loopRunning = true;
   State.gameStarted = true;
   myGame.mode = 'draw';
+  myGame.loadExample("custom1");
 
   $('#start-btn').click(function() {
     console.log("start button clicked");

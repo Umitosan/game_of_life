@@ -431,6 +431,9 @@ $(document).ready(function() {
       $("#coords-y").text(State.mouseY);
   }, false);
 
+  //INPUT
+  var leftMouseDown = false;
+
   // this is to correct for canvas blurryness on single pixel wide lines etc
   // important when animating to reduce rendering artifacts and other oddities
   // ctx.translate(0.5, 0.5);
@@ -467,6 +470,24 @@ $(document).ready(function() {
       myGame.pauseIt();
     } else if (myGame.paused === true) {
       myGame.unpauseIt();
+    }
+  });
+
+  //INPUT
+  $('#speed-slider').mousedown(function(e1) {
+    leftMouseDown = true;
+  }).mouseup(function(e2) {
+    leftMouseDown = false;
+  });
+
+  $('#speed-slider').mousemove(function(e) {
+    if (leftMouseDown === true) {
+      let v = this.value;
+      $('#speed-input').prop("value", v);
+      if (myGame.mode === 'sim') {
+        myGame.updateDuration = (1000/v);
+        console.log('myGame.updateDuration changed = ', myGame.updateDuration);
+      }
     }
   });
 

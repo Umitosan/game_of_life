@@ -65,6 +65,28 @@ body {
 
 }
 
+.speed-container {
+  width: 540px;
+  display: flex;
+  margin: 10px auto 0px auto;
+  /* outline-color: red;
+  outline-style: solid;
+  outline-width: 1px; */
+}
+#speed-slider-label {
+  font-size: 20px;
+
+}
+#speed-slider {
+  margin: 0px auto 0px 20px;
+  width: 200px;
+}
+#speed-input {
+  height: 30px;
+  font-size: 16px;
+  margin-left: 20px;
+}
+
 
 .canvas-container {
   margin: 0px auto;
@@ -72,7 +94,7 @@ body {
   height: 100%;
 }
 #canvas {
-  margin: 20px auto;
+  margin: 16px auto;
   background-color: lightblue;
   /* outline-color: red;
   outline-style: solid;

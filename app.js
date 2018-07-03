@@ -482,6 +482,13 @@ $(document).ready(function() {
   }).mouseup(function(e2) {
     leftMouseDown = false;
   });
+  $('#speed-input').on('change', function(e) {
+    let v = this.value;
+    $('#speed-slider').prop("value", v);
+    if (myGame.mode === 'sim') {
+      myGame.updateDuration = (1000/v);
+    }
+  });
 
   $('#speed-slider').mousemove(function(e) {
     if (leftMouseDown === true) {

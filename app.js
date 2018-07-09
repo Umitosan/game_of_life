@@ -319,10 +319,8 @@ function Game(updateDur) {
 
             if (this.mode === "draw") { // run this every update cycle regardless of timing
               if (State.mouseLeftDown) {
-                // console.log('painting');
                 this.paintBox();
               } else if (State.mouseRightDown) {
-                // console.log('erasing');
                 this.eraseBox();
               }
             } else {
@@ -451,6 +449,7 @@ $(document).ready(function() {
     if (myGame.mode === 'draw') {
       myGame.simStart = performance.now();
       myGame.mode = 'sim';
+      $('#mode-current-status')[0].innerText = 'Simulate';
       let v = $('#speed-slider').val();
       $('#speed-input').prop("value", v);
       myGame.updateDuration = (1000/v);
@@ -465,6 +464,7 @@ $(document).ready(function() {
     State.loopRunning = true;
     State.gameStarted = true;
     myGame.mode = 'draw';
+    $('#mode-current-status')[0].innerText = 'draw';
   });
 
   $('#pause-btn').click(function() {

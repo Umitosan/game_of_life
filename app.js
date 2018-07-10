@@ -50,6 +50,7 @@ function Colors() {
   this.lightGreyTrans = 'rgba(50, 50, 50, 0.3)';
   this.greyReset = 'rgb(211,211,211)';
   this.lighterGreyReset = 'rgb(240,240,240)';
+  this.lightGreyBox = 'rgba(220, 220, 220, 1)';
   this.white = 'rgba(250, 250, 250, 1)';
   this.red = 'rgba(230, 0, 0, 1)';
   this.cherry = 'rgba(242,47,8,1)';
@@ -84,14 +85,14 @@ function Game(updateDur) {
   this.lastKey = 0;
   this.pausedTxt = undefined;
   this.grid = undefined;
-  this.boxSize = 9;
+  this.boxSize = 10;
   this.gridWidth = 81;
   this.gridHeight = 60;
   this.curBoxC = 0;
   this.curBoxR = 0;
   this.mode = 'init';
-  this.boxColorOn = myColors.electricBlue;
-  this.boxColorOff = myColors.white;
+  this.boxColorOn = 'RGB(127, 255, 212)';
+  this.boxColorOff = 'RGBA(126, 126, 126, 1)';
 
   this.init = function() {
     this.bg.src = 'bg1.png';
@@ -99,7 +100,7 @@ function Game(updateDur) {
     for (let r = 0; r < this.gridHeight; r++) {
       let tmpRow = [];
       for (let c = 0; c < this.gridWidth; c++) {
-        tmpRow.push( new Box((c*9)+(c+1),(r*9)+(r+1),this.boxColorOff,this.boxSize)); // +1 is for 1 pixel gap between boxes
+        tmpRow.push( new Box((c*10)+(c+1),(r*10)+(r+1),this.boxColorOff,this.boxSize)); // +1 is for 1 pixel gap between boxes
       }
       this.grid.push(tmpRow);
     }
@@ -292,7 +293,7 @@ function Game(updateDur) {
 
   this.drawBG = function() { // display background over canvas
     ctx.imageSmoothingEnabled = false;  // turns off AntiAliasing
-    ctx.drawImage(this.bg,4,4,CANVAS.width-9,CANVAS.height-9);
+    ctx.drawImage(this.bg,4,4,CANVAS.width-10,CANVAS.height-10);
   };
 
   this.draw = function() {
@@ -464,15 +465,19 @@ $(document).ready(function() {
     State.loopRunning = true;
     State.gameStarted = true;
     myGame.mode = 'draw';
+    $('#pause-btn')[0].innerText = 'PAUSE';
     $('#mode-current-status')[0].innerText = 'draw';
+    myGame.loadExample('custom1');
   });
 
   $('#pause-btn').click(function() {
     console.log("pause button clicked");
     if (myGame.paused === false) {
       myGame.pauseIt();
+      $('#pause-btn')[0].innerText = 'UN-PAUSE';
     } else if (myGame.paused === true) {
       myGame.unpauseIt();
+      $('#pause-btn')[0].innerText = 'PAUSE';
     }
   });
 

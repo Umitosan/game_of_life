@@ -12,7 +12,7 @@ body {
 }
 
 .main-container {
-  width: 840px;
+  width: 1000px;
   height: 100%;
   margin: 20px auto 0px auto;
   border-color: black;
@@ -39,6 +39,7 @@ body {
   outline-width: 1px; */
 }
 .buttons-container button {
+  font-weight: 600;
   color: black;
   width: 100px;
   height: 54px;
@@ -58,7 +59,7 @@ body {
 
 .status-container {
   margin: 12px auto 0px auto;
-  width: 600px;
+  width: 480px;
   height: 80px;
   /* outline-color: green;
   outline-style: solid;
@@ -89,6 +90,7 @@ body {
   outline-width: 1px; */
 }
 #coords {
+  margin: 10px auto auto auto;
   text-align: center;
   font-size: 16px;
 }
@@ -158,13 +160,17 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 
 .canvas-container {
-  margin: 0px auto;
-  width: 800px;
-  height: 100%;
+  margin: 20px auto 0px auto;
+  width: 884px;
+  height: 652px;
+  /* outline-color: red;
+  outline-style: solid;
+  outline-width: 1px; */
 }
 #canvas {
-  margin: 16px auto;
-  background-color: lightblue;
+  margin: 0px 0px;
+  /* background-color: lightblue; */
+  background-color: rgba(153,153,153,1);
   /* outline-color: red;
   outline-style: solid;
   outline-width: 1px; */

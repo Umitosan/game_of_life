@@ -32,6 +32,7 @@ var examples = {
     {row: 31, col: 47}
   ],
   "infinite1": [
+    {row: 29, col: 20},
     {row: 29, col: 21},
     {row: 29, col: 22},
     {row: 29, col: 23},

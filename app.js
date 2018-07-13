@@ -512,5 +512,8 @@ $(document).ready(function() {
   $('#koks-galexy').click(function(e) {
     myGame.loadExample("koksGalexy");
   });
+  $('#infinite1').click(function(e) {
+    myGame.loadExample("infinite1");
+  });
 
 });

@@ -186,7 +186,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
   margin: 0px auto 26px auto;
 }
 .example img {
-  height: 70px;
   border-width: 0px;
   border-color: none;
   border-style: none;
@@ -197,6 +196,15 @@ input[type=range]:focus::-webkit-slider-runnable-track {
   transition: border-radius 200ms;
 }
 
+#glider-gun {
+  max-width: 400px;
+}
+#koks-galexy {
+  max-width: 360px;
+}
+#infinite1 {
+  max-width: 600px;
+}
 
 
 footer {

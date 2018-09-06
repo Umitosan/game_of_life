@@ -1,7 +1,7 @@
 # Conway's game of life
 
 This web-app was built as an exercise in html's canvas
-* **[Live site](https://umitosan.github.io/game_of_life/)**
+* **[Live site](http://www.gameoflife.dombrown.net/)**
 
 ## Rules of propagation (from wikipedia)
 
